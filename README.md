@@ -1,2 +1,2 @@
 # MasterProjSivofE
-Prime number finder accelerator
+Prime number finder accelerator. 
