@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <stddef.h>
 #include <math.h>
+#include <string>
+#include <sstream>
 
 #define MAP_SIZE 4096UL
 #define MAP_MASK (MAP_SIZE - 1)
@@ -28,11 +30,6 @@ private:
     unsigned *device_base_vaddress[3];
 
 public:
-    typedef struct {
-        uint32_t* prime_array;
-        uint32_t num_primes;
-    } PrimeOutArrayIf;
-
     PrimeSieveApi(uint16_t pe = 256, uint16_t rows = 512);
 
     unsigned *pe_register_vaddress(unsigned pe_id, unsigned register_id);
@@ -63,9 +60,9 @@ public:
 
     void compute_all();
 
-    void read_memory_n(uint32_t n, PrimeOutArrayIf* ptr);
+    std::stringstream read_memory_n(uint32_t n);
 
-    PrimeOutArrayIf compute_prime(uint32_t n);
+    std::stringstream compute_prime(uint32_t n);
 
     float time_compute(uint32_t n);
 };

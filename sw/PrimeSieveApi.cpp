@@ -287,8 +287,9 @@ void PrimeSieveApi::compute_all()
     }
 }
 
-void PrimeSieveApi::read_memory_n(uint32_t n, PrimeSieveApi::PrimeOutArrayIf *ptr)
+std::stringstream PrimeSieveApi::read_memory_n(uint32_t n)
 {
+    std::stringstream res;
     bool done = false;
     for (unsigned pe_id = 0; pe_id < NUMBER_OF_PE && !done; pe_id++)
     {
@@ -304,7 +305,7 @@ void PrimeSieveApi::read_memory_n(uint32_t n, PrimeSieveApi::PrimeOutArrayIf *pt
                     {
                         if (boolean_id >= FIRST_PRIME)
                         {
-                            //ptr->prime_array[ptr->num_primes++] = boolean_id;
+                            //res << boolean_id << " ";
                         }
                     }
                     else
@@ -315,19 +316,16 @@ void PrimeSieveApi::read_memory_n(uint32_t n, PrimeSieveApi::PrimeOutArrayIf *pt
             }
         }
     }
+    return res;
 }
 
-PrimeSieveApi::PrimeOutArrayIf PrimeSieveApi::compute_prime(uint32_t n)
+std::stringstream PrimeSieveApi::compute_prime(uint32_t n)
 {
     const uint32_t max_sup_prime = (NUMBER_OF_ROWS * 32 * NUMBER_OF_PE) - 1;
-    const uint32_t max_sup_num_of_primes = (max_sup_prime / log(max_sup_prime)); // Prime-number theorem: π(n) ≈ n/ln(n)
+    const uint32_t max_sup_num_of_primes = (max_sup_prime / (log(max_sup_prime) - 1)); // Prime-number theorem: π(n) ≈ n/ln(n)
 
     unsigned current_prime = FIRST_PRIME;
     unsigned current_prime_squared = current_prime * current_prime;
-
-    PrimeOutArrayIf result;
-    //result.prime_array = reinterpret_cast<uint32_t *>(malloc(max_sup_num_of_primes));
-    result.num_primes = 0;
 
     clear_memory_all();
 
@@ -337,17 +335,17 @@ PrimeSieveApi::PrimeOutArrayIf PrimeSieveApi::compute_prime(uint32_t n)
         current_prime_squared = current_prime * current_prime;
     }
 
-    read_memory_n(n, &result);
-    return result;
+    return read_memory_n(n);
 }
 
 float PrimeSieveApi::time_compute(uint32_t n)
 {
     clock_t start, end;
     start = clock();
-    PrimeOutArrayIf result = compute_prime(n);
+    //std::stringstream res = compute_prime(n);
+    compute_prime(n);
     end = clock();
     float cpu_time = ((float)(end - start)) * 1000 / CLOCKS_PER_SEC;
-    //delete result.prime_array;
+    //printf("%s\n", res.str().c_str());
     return cpu_time;
 }
