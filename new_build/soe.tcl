@@ -809,3 +809,19 @@ set_property -name "steps.write_bitstream.args.more options" -value "" -objects 
 current_run -implementation [get_runs impl_1]
 
 puts "INFO: Project created:$project_name"
+
+launch_runs impl_1 -to_step write_bitstream -jobs 8 -verbose
+
+wait_on_run -verbose impl_1
+
+if {[get_property PROGRESS [get_runs impl_1]] != "100%"} {
+  error "ERROR: impl_1 failed"
+}
+
+set biffile [open "./${project_name}.bif" w]
+puts $biffile "all:\n{\n  $proj_dir/${project_name}.runs/impl_1/pl_wrapper.bit\n}"
+close $biffile
+
+exec bootgen -image ./${project_name}.bif -arch zynq -process_bitstream bin
+
+file copy -force $proj_dir/${project_name}.runs/impl_1/pl_wrapper.bit.bin ./${project_name}.bin
