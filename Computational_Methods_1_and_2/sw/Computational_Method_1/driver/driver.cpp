@@ -319,7 +319,7 @@ int main () {
         read_memory_all  ();
         clock_counter [3] = * clock_counter_vaddress;
 
-        for (unsigned i = 0; i < 4; i ++) {
+        for (unsigned i = 1; i < 4; i ++) {
                 printf ("clock_counter [%u] = %u\n", i, clock_counter [i]);
         }
 
