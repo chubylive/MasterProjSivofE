@@ -63,18 +63,17 @@ assign                        max_offset_q = {1'b0, argument_3_q};
 reg   [C_PE_OFFSET_W_Q    :0] current_offset_q;
 reg                     [3:0] current_offset_r;
 reg   [C_PE_STEP_W_R    -1:0] delta_index;
-reg   [C_PE_OFFSET_W_Q    :0] next_offset_q;
-reg                     [3:0] next_offset_r;
 
-always @ (*) begin
-        if (delta_index == 1'b0) begin
-                next_offset_q = current_offset_q + {argument_1_q, {2 {argument_1_r}}};
-                next_offset_r = current_offset_r + ((argument_1_r == 1'b0) ? 3'h4 : 2'h2);
-        end else begin
-                next_offset_q = current_offset_q + {argument_1_q, argument_1_r};
-                next_offset_r = current_offset_r + ((argument_1_r == 1'b0) ? 2'h2 : 3'h4);
-        end
-end
+wire  [C_PE_OFFSET_W_Q    :0] next_offset_stage_1_q;
+wire                    [3:0] next_offset_stage_1_r;
+wire                          next_offset_stage_1_r_overflow;
+wire                    [3:0] next_offset_stage_2_r;
+
+assign                        next_offset_stage_1_r          = current_offset_r + ((delta_index == argument_1_r) ? 3'h4 : 2'h2);
+assign                        next_offset_stage_1_r_overflow = ((next_offset_stage_1_r == 4'd7) | (next_offset_stage_1_r == 4'd11));
+assign                        next_offset_stage_2_r          = next_offset_stage_1_r_overflow ? ({1'b0, ~ next_offset_stage_1_r[2], 2'b01}) : next_offset_stage_1_r;
+
+assign                        next_offset_stage_1_q          = current_offset_q + ((delta_index == 1'b0) ? {argument_1_q, {2 {argument_1_r}}} : {argument_1_q, argument_1_r}) + next_offset_stage_1_r_overflow;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -135,8 +134,8 @@ always @ (posedge clock) begin
                                 delta_index      <= step_delta_index;
                         end else begin
                                 if (current_offset_at_most_max_offset_and_next_memory_read_address_equals_current_memory_read_address) begin
-                                        current_offset_q <= ((next_offset_r == 4'd7) | (next_offset_r == 4'd11)) ? (next_offset_q + 1'b1) : next_offset_q;
-                                        current_offset_r <= ((next_offset_r == 4'd7) | (next_offset_r == 4'd11)) ? ({1'b0, ~ next_offset_r[2], 2'b01}) : next_offset_r;
+                                        current_offset_q <= next_offset_stage_1_q;
+                                        current_offset_r <= next_offset_stage_2_r;
                                         delta_index      <= ~ delta_index;
                                 end else begin
                                         current_offset_q <= current_offset_q;
@@ -167,116 +166,139 @@ end
 wire                    [4:0] current_boolean_bit_position;
 assign                        current_boolean_bit_position = {current_offset_q[3:0], current_offset_r[2]};
 
-wire                          new_boolean_bit_vector_bit_0;
-wire                          new_boolean_bit_vector_bit_1;
-wire                          new_boolean_bit_vector_bit_2;
-wire                          new_boolean_bit_vector_bit_3;
-wire                          new_boolean_bit_vector_bit_4;
-wire                          new_boolean_bit_vector_bit_5;
-wire                          new_boolean_bit_vector_bit_6;
-wire                          new_boolean_bit_vector_bit_7;
-wire                          new_boolean_bit_vector_bit_8;
-wire                          new_boolean_bit_vector_bit_9;
+reg   [C_PE_M_DATA_W    -1:0] new_boolean_bit_vector;
 
-wire                          new_boolean_bit_vector_bit_10;
-wire                          new_boolean_bit_vector_bit_11;
-wire                          new_boolean_bit_vector_bit_12;
-wire                          new_boolean_bit_vector_bit_13;
-wire                          new_boolean_bit_vector_bit_14;
-wire                          new_boolean_bit_vector_bit_15;
-wire                          new_boolean_bit_vector_bit_16;
-wire                          new_boolean_bit_vector_bit_17;
-wire                          new_boolean_bit_vector_bit_18;
-wire                          new_boolean_bit_vector_bit_19;
+always @ (*) begin
+        case (current_boolean_bit_position)
+                5'd0 : begin
+                        new_boolean_bit_vector <= 32'h0000_0001;
+                end
 
-wire                          new_boolean_bit_vector_bit_20;
-wire                          new_boolean_bit_vector_bit_21;
-wire                          new_boolean_bit_vector_bit_22;
-wire                          new_boolean_bit_vector_bit_23;
-wire                          new_boolean_bit_vector_bit_24;
-wire                          new_boolean_bit_vector_bit_25;
-wire                          new_boolean_bit_vector_bit_26;
-wire                          new_boolean_bit_vector_bit_27;
-wire                          new_boolean_bit_vector_bit_28;
-wire                          new_boolean_bit_vector_bit_29;
+                5'd1 : begin
+                        new_boolean_bit_vector <= 32'h0000_0002;
+                end
 
-wire                          new_boolean_bit_vector_bit_30;
-wire                          new_boolean_bit_vector_bit_31;
+                5'd2 : begin
+                        new_boolean_bit_vector <= 32'h0000_0004;
+                end
 
-assign                        new_boolean_bit_vector_bit_0  = (current_boolean_bit_position == 5'd0 );
-assign                        new_boolean_bit_vector_bit_1  = (current_boolean_bit_position == 5'd1 );
-assign                        new_boolean_bit_vector_bit_2  = (current_boolean_bit_position == 5'd2 );
-assign                        new_boolean_bit_vector_bit_3  = (current_boolean_bit_position == 5'd3 );
-assign                        new_boolean_bit_vector_bit_4  = (current_boolean_bit_position == 5'd4 );
-assign                        new_boolean_bit_vector_bit_5  = (current_boolean_bit_position == 5'd5 );
-assign                        new_boolean_bit_vector_bit_6  = (current_boolean_bit_position == 5'd6 );
-assign                        new_boolean_bit_vector_bit_7  = (current_boolean_bit_position == 5'd7 );
-assign                        new_boolean_bit_vector_bit_8  = (current_boolean_bit_position == 5'd8 );
-assign                        new_boolean_bit_vector_bit_9  = (current_boolean_bit_position == 5'd9 );
+                5'd3 : begin
+                        new_boolean_bit_vector <= 32'h0000_0008;
+                end
 
-assign                        new_boolean_bit_vector_bit_10 = (current_boolean_bit_position == 5'd10);
-assign                        new_boolean_bit_vector_bit_11 = (current_boolean_bit_position == 5'd11);
-assign                        new_boolean_bit_vector_bit_12 = (current_boolean_bit_position == 5'd12);
-assign                        new_boolean_bit_vector_bit_13 = (current_boolean_bit_position == 5'd13);
-assign                        new_boolean_bit_vector_bit_14 = (current_boolean_bit_position == 5'd14);
-assign                        new_boolean_bit_vector_bit_15 = (current_boolean_bit_position == 5'd15);
-assign                        new_boolean_bit_vector_bit_16 = (current_boolean_bit_position == 5'd16);
-assign                        new_boolean_bit_vector_bit_17 = (current_boolean_bit_position == 5'd17);
-assign                        new_boolean_bit_vector_bit_18 = (current_boolean_bit_position == 5'd18);
-assign                        new_boolean_bit_vector_bit_19 = (current_boolean_bit_position == 5'd19);
+                5'd4 : begin
+                        new_boolean_bit_vector <= 32'h0000_0010;
+                end
 
-assign                        new_boolean_bit_vector_bit_20 = (current_boolean_bit_position == 5'd20);
-assign                        new_boolean_bit_vector_bit_21 = (current_boolean_bit_position == 5'd21);
-assign                        new_boolean_bit_vector_bit_22 = (current_boolean_bit_position == 5'd22);
-assign                        new_boolean_bit_vector_bit_23 = (current_boolean_bit_position == 5'd23);
-assign                        new_boolean_bit_vector_bit_24 = (current_boolean_bit_position == 5'd24);
-assign                        new_boolean_bit_vector_bit_25 = (current_boolean_bit_position == 5'd25);
-assign                        new_boolean_bit_vector_bit_26 = (current_boolean_bit_position == 5'd26);
-assign                        new_boolean_bit_vector_bit_27 = (current_boolean_bit_position == 5'd27);
-assign                        new_boolean_bit_vector_bit_28 = (current_boolean_bit_position == 5'd28);
-assign                        new_boolean_bit_vector_bit_29 = (current_boolean_bit_position == 5'd29);
+                5'd5 : begin
+                        new_boolean_bit_vector <= 32'h0000_0020;
+                end
 
-assign                        new_boolean_bit_vector_bit_30 = (current_boolean_bit_position == 5'd30);
-assign                        new_boolean_bit_vector_bit_31 = (current_boolean_bit_position == 5'd31);
+                5'd6 : begin
+                        new_boolean_bit_vector <= 32'h0000_0040;
+                end
 
-wire  [C_PE_M_DATA_W    -1:0] new_boolean_bit_vector;
-assign                        new_boolean_bit_vector = {
-                                      new_boolean_bit_vector_bit_31,
-                                      new_boolean_bit_vector_bit_30,
+                5'd7 : begin
+                        new_boolean_bit_vector <= 32'h0000_0080;
+                end
 
-                                      new_boolean_bit_vector_bit_29,
-                                      new_boolean_bit_vector_bit_28,
-                                      new_boolean_bit_vector_bit_27,
-                                      new_boolean_bit_vector_bit_26,
-                                      new_boolean_bit_vector_bit_25,
-                                      new_boolean_bit_vector_bit_24,
-                                      new_boolean_bit_vector_bit_23,
-                                      new_boolean_bit_vector_bit_22,
-                                      new_boolean_bit_vector_bit_21,
-                                      new_boolean_bit_vector_bit_20,
+                5'd8 : begin
+                        new_boolean_bit_vector <= 32'h0000_0100;
+                end
 
-                                      new_boolean_bit_vector_bit_19,
-                                      new_boolean_bit_vector_bit_18,
-                                      new_boolean_bit_vector_bit_17,
-                                      new_boolean_bit_vector_bit_16,
-                                      new_boolean_bit_vector_bit_15,
-                                      new_boolean_bit_vector_bit_14,
-                                      new_boolean_bit_vector_bit_13,
-                                      new_boolean_bit_vector_bit_12,
-                                      new_boolean_bit_vector_bit_11,
-                                      new_boolean_bit_vector_bit_10,
+                5'd9 : begin
+                        new_boolean_bit_vector <= 32'h0000_0200;
+                end
 
-                                      new_boolean_bit_vector_bit_9,
-                                      new_boolean_bit_vector_bit_8,
-                                      new_boolean_bit_vector_bit_7,
-                                      new_boolean_bit_vector_bit_6,
-                                      new_boolean_bit_vector_bit_5,
-                                      new_boolean_bit_vector_bit_4,
-                                      new_boolean_bit_vector_bit_3,
-                                      new_boolean_bit_vector_bit_2,
-                                      new_boolean_bit_vector_bit_1,
-                                      new_boolean_bit_vector_bit_0
-                              };
+                5'd10 : begin
+                        new_boolean_bit_vector <= 32'h0000_0400;
+                end
+
+                5'd11 : begin
+                        new_boolean_bit_vector <= 32'h0000_0800;
+                end
+
+                5'd12 : begin
+                        new_boolean_bit_vector <= 32'h0000_1000;
+                end
+
+                5'd13 : begin
+                        new_boolean_bit_vector <= 32'h0000_2000;
+                end
+
+                5'd14 : begin
+                        new_boolean_bit_vector <= 32'h0000_4000;
+                end
+
+                5'd15 : begin
+                        new_boolean_bit_vector <= 32'h0000_8000;
+                end
+
+                5'd16 : begin
+                        new_boolean_bit_vector <= 32'h0001_0000;
+                end
+
+                5'd17 : begin
+                        new_boolean_bit_vector <= 32'h0002_0000;
+                end
+
+                5'd18 : begin
+                        new_boolean_bit_vector <= 32'h0004_0000;
+                end
+
+                5'd19 : begin
+                        new_boolean_bit_vector <= 32'h0008_0000;
+                end
+
+                5'd20 : begin
+                        new_boolean_bit_vector <= 32'h0010_0000;
+                end
+
+                5'd21 : begin
+                        new_boolean_bit_vector <= 32'h0020_0000;
+                end
+
+                5'd22 : begin
+                        new_boolean_bit_vector <= 32'h0040_0000;
+                end
+
+                5'd23 : begin
+                        new_boolean_bit_vector <= 32'h0080_0000;
+                end
+
+                5'd24 : begin
+                        new_boolean_bit_vector <= 32'h0100_0000;
+                end
+
+                5'd25 : begin
+                        new_boolean_bit_vector <= 32'h0200_0000;
+                end
+
+                5'd26 : begin
+                        new_boolean_bit_vector <= 32'h0400_0000;
+                end
+
+                5'd27 : begin
+                        new_boolean_bit_vector <= 32'h0800_0000;
+                end
+
+                5'd28 : begin
+                        new_boolean_bit_vector <= 32'h1000_0000;
+                end
+
+                5'd29 : begin
+                        new_boolean_bit_vector <= 32'h2000_0000;
+                end
+
+                5'd30 : begin
+                        new_boolean_bit_vector <= 32'h4000_0000;
+                end
+
+                5'd31 : begin
+                        new_boolean_bit_vector <= 32'h8000_0000;
+                end
+        endcase
+end
 
 reg   [C_PE_M_DATA_W    -1:0] current_boolean_bit_vector;
 
