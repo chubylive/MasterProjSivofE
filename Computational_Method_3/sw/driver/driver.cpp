@@ -17,7 +17,7 @@
 #define BASE_ADDRESS_1 0x43C10000
 
 #define NUMBER_OF_ROWS 512
-#define NUMBER_OF_PE   256
+#define NUMBER_OF_PE   280
 #define FIRST_PRIME    5
 
 #define MAX_OFFSET     (((NUMBER_OF_ROWS << 4) - 1) * 6 + 5)
@@ -93,9 +93,9 @@ unsigned * pe_data_register_vaddress (unsigned pe_id) {
         unsigned * vaddress;
 
         if (pe_id < 128) {
-                vaddress = device_base_vaddress [0] + (                128  << 1) +  pe_id       ;
+                vaddress = device_base_vaddress [0] + 320 +  pe_id       ;
         } else {
-                vaddress = device_base_vaddress [1] + ((NUMBER_OF_PE - 128) << 1) + (pe_id - 128);
+                vaddress = device_base_vaddress [1] + 320 + (pe_id - 128);
         }
 
         return vaddress;
@@ -105,9 +105,9 @@ unsigned * pe_status_register_vaddress (unsigned pe_id) {
         unsigned * vaddress;
 
         if (pe_id < 128) {
-                vaddress = device_base_vaddress [0] + (                128  << 1) +                 128  + ( pe_id        >> 5);
+                vaddress = device_base_vaddress [0] + 480 + ( pe_id        >> 5);
         } else {
-                vaddress = device_base_vaddress [1] + ((NUMBER_OF_PE - 128) << 1) + (NUMBER_OF_PE - 128) + ((pe_id - 128) >> 5);
+                vaddress = device_base_vaddress [1] + 480 + ((pe_id - 128) >> 5);
         }
 
         return vaddress;
@@ -345,12 +345,25 @@ void compute_all (void) {
 }
 
 int main () {
+        unsigned * clock_counter_vaddress;
+        unsigned clock_counter [4];
+
         device_base_vaddress [0] = (unsigned *) getvaddr (BASE_ADDRESS_0);
         device_base_vaddress [1] = (unsigned *) getvaddr (BASE_ADDRESS_1);
 
+        clock_counter_vaddress = device_base_vaddress [1] + 496;
+
+        clock_counter [0] = * clock_counter_vaddress;
         clear_memory_all ();
+        clock_counter [1] = * clock_counter_vaddress;
         compute_all      ();
+        clock_counter [2] = * clock_counter_vaddress;
         read_memory_all  ();
+        clock_counter [3] = * clock_counter_vaddress;
+
+        for (unsigned i = 0; i < 4; i ++) {
+                printf ("clock_counter [%u] = %u\n", i, clock_counter [i]);
+        }
 
         return 0;
 }
