@@ -1,6 +1,6 @@
 CC=g++          # define the compiler to use
 TARGET=main     # define the name of the executable
-SOURCES=main.cpp PrimeSieveApi.cpp
+SOURCES=$(wildcard *.cpp *.c)
 CFLAGS=-O3
 LFLAGS=-lm
 
