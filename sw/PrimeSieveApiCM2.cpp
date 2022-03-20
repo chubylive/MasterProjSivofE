@@ -310,12 +310,12 @@ std::stringstream PrimeSieveApiCM2::read_memory_n(uint32_t n)
             {
                 if ((memory_read_data & (1 << bit_position)) == 0)
                 {
-                    unsigned boolean_id = ((pe_id * NUMBER_OF_ROWS + row) << 5) + bit_position;
+                    unsigned boolean_id = ((((pe_id * NUMBER_OF_ROWS + row) << 5) + bit_position) << 1) + 1;
                     if (boolean_id <= n)
                     {
                         if (boolean_id >= FIRST_PRIME_CM2)
                         {
-                            res << boolean_id << " ";
+                            res << boolean_id << "\n";
                         }
                     }
                     else
@@ -351,7 +351,8 @@ float PrimeSieveApiCM2::time_compute(uint32_t n)
 {
     clock_t start, end;
     clear_memory_all();
-
+    FILE * fp;
+    fp = fopen ("cm2Out.txt", "w");
     start = clock();
     compute_prime(n);
     end = clock();
@@ -359,5 +360,7 @@ float PrimeSieveApiCM2::time_compute(uint32_t n)
 
     float cpu_time = ((float)(end - start)) * 1000 / CLOCKS_PER_SEC;
     // printf("%s\n", res.str().c_str());
+    fprintf(fp, "%s",  res.str().c_str());
+    fclose(fp);
     return cpu_time;
 }

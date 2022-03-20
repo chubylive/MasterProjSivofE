@@ -258,54 +258,54 @@ unsigned PrimeSieveApiCM3::compute_for_current_prime(unsigned current_prime)
 }
 
 unsigned PrimeSieveApiCM3::get_next_index (unsigned current_index) {
-        unsigned memory_read_data_available;
+    unsigned memory_read_data_available;
 
-        memory_read_data_available = 0;
+    memory_read_data_available = 0;
 
-        while (1) {
-                unsigned global_row;
-                unsigned bit_position;
-                unsigned memory_read_data;
+    while (1) {
+        unsigned global_row;
+        unsigned bit_position;
+        unsigned memory_read_data;
 
-                unsigned pe_id;
-                unsigned row;
+        unsigned pe_id;
+        unsigned row;
 
-                current_index ++;
+        current_index ++;
 
-                global_row = current_index >> 5;
-                bit_position = current_index & 31;
+        global_row = current_index >> 5;
+        bit_position = current_index & 31;
 
-                if (memory_read_data_available && ((global_row / NUMBER_OF_ROWS) == pe_id) && ((global_row % NUMBER_OF_ROWS) == row)) {
-                } else {
-                        memory_read_data_available = 1;
-                        pe_id = global_row / NUMBER_OF_ROWS;
-                        row = global_row % NUMBER_OF_ROWS;
+        if (memory_read_data_available && ((global_row / NUMBER_OF_ROWS) == pe_id) && ((global_row % NUMBER_OF_ROWS) == row)) {
+        } else {
+            memory_read_data_available = 1;
+            pe_id = global_row / NUMBER_OF_ROWS;
+            row = global_row % NUMBER_OF_ROWS;
 
-                        memory_read_data = read_memory_row (pe_id, row);
-                }
-
-                if ((memory_read_data & (1 << bit_position)) == 0) {
-                        break;
-                }
+            memory_read_data = read_memory_row (pe_id, row);
         }
 
-        return current_index;
+        if ((memory_read_data & (1 << bit_position)) == 0) {
+            break;
+        }
+    }
+
+    return current_index;
 }
 
 
 void PrimeSieveApiCM3::compute_all()
 {
-        unsigned current_prime;
-        unsigned current_index;
+    unsigned current_prime;
+    unsigned current_index;
 
-        current_prime = FIRST_PRIME_CM3;
+    current_prime = FIRST_PRIME_CM3;
 
-        current_index = value_to_index (current_prime);
+    current_index = value_to_index (current_prime);
 
-        while (compute_for_current_prime (current_prime)) {
-                current_index = get_next_index (current_index);
-                current_prime = index_to_value (current_index);
-        }
+    while (compute_for_current_prime (current_prime)) {
+        current_index = get_next_index (current_index);
+        current_prime = index_to_value (current_index);
+    }
 }
 
 std::stringstream PrimeSieveApiCM3::read_memory_n(uint32_t n)
@@ -322,11 +322,12 @@ std::stringstream PrimeSieveApiCM3::read_memory_n(uint32_t n)
                 if ((memory_read_data & (1 << bit_position)) == 0)
                 {
                     unsigned boolean_id = ((pe_id * NUMBER_OF_ROWS + row) << 5) + bit_position;
-                    if (boolean_id <= n)
+                    unsigned value = index_to_value (boolean_id);
+                    if (value <= n)
                     {
-                        if (boolean_id >= FIRST_PRIME_CM3)
+                        if (value >= FIRST_PRIME_CM3)
                         {
-                            res << boolean_id << " ";
+                            res << value << "\n";
                         }
                     }
                     else
@@ -364,7 +365,8 @@ float PrimeSieveApiCM3::time_compute(uint32_t n)
 {
     clock_t start, end;
     clear_memory_all();
-
+    FILE * fp;
+    fp = fopen ("cm3Out.txt", "w");
     start = clock();
     compute_prime(n);
     end = clock();
@@ -372,5 +374,32 @@ float PrimeSieveApiCM3::time_compute(uint32_t n)
 
     float cpu_time = ((float)(end - start)) * 1000 / CLOCKS_PER_SEC;
     // printf("%s\n", res.str().c_str());
+    fprintf(fp, "%s",  res.str().c_str());
+    fclose(fp);
     return cpu_time;
+}
+
+
+float PrimeSieveApiCM3::time_compute_int(uint32_t n)
+{
+    unsigned * clock_counter_vaddress = device_base_vaddress [1] + 496;
+
+    unsigned clockStart, clockEnd;
+
+    clock_t start, end;
+    clear_memory_all();
+    FILE * fp;
+    fp = fopen ("cm3Out.txt", "w");
+    // start = clock();
+    clockStart = * clock_counter_vaddress;
+    compute_prime(n);
+    // end = clock();
+    clockEnd = * clock_counter_vaddress;
+    std::stringstream res = read_memory_n(n);
+
+    // float cpu_time = ((float)(end - start)) * 1000 / CLOCKS_PER_SEC;
+    // printf("%s\n", res.str().c_str());
+    fprintf(fp, "%s",  res.str().c_str());
+    fclose(fp);
+    return ((1/5e7) * ((float)clockEnd) ) * 1000;
 }

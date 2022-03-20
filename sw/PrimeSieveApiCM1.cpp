@@ -1,6 +1,8 @@
 #include "PrimeSieveApiCM1.h"
 #include <time.h>
 #include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void *getvaddr(off_t phys_addr)
 {
@@ -315,7 +317,7 @@ std::stringstream PrimeSieveApiCM1::read_memory_n(uint32_t n)
                     {
                         if (boolean_id >= FIRST_PRIME)
                         {
-                            res << boolean_id << " ";
+                            res << boolean_id << "\n";
                         }
                     }
                     else
@@ -351,6 +353,9 @@ float PrimeSieveApiCM1::time_compute(uint32_t n)
 {
     clock_t start, end;
     clear_memory_all();
+    FILE * fp;
+
+    fp = fopen ("cm1Out.txt", "w");
 
     start = clock();
     compute_prime(n);
@@ -359,5 +364,8 @@ float PrimeSieveApiCM1::time_compute(uint32_t n)
 
     float cpu_time = ((float)(end - start)) * 1000 / CLOCKS_PER_SEC;
     // printf("%s\n", res.str().c_str());
+    fprintf(fp, "%s",  res.str().c_str());
+
+    fclose(fp);
     return cpu_time;
 }

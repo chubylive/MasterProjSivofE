@@ -89,4 +89,6 @@ public:
     void compute_prime(uint32_t n);
 
     float time_compute(uint32_t n);
+
+    float time_compute_int(uint32_t n);
 };
