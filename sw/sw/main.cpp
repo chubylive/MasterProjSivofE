@@ -18,6 +18,7 @@ void calc_method_1()
     {
         unsigned in = input - 1;
         printf("** Input value: %d\n", in);
+        out_file << "compute_1_" << in << " = np.array([" << std::endl;
         for (int rows = 512; rows > 0; rows >>= 1)
         {
             unsigned required_pe = input / rows / 32;
@@ -27,14 +28,16 @@ void calc_method_1()
             }
             float time_elapsed = psm.time_compute_0(in, required_pe, rows);
             printf("Compute method 1 %#x using %*d pe and %*d rows took %.*fms.\n", in, 3, required_pe, 3, rows, 10, time_elapsed);
-            out_file << "Compute_method_1"
-                     << "\t" << in << "\t" << required_pe << "\t" << rows << "\t" << std::setprecision(10) << std::fixed << time_elapsed << std::endl;
+            out_file << "    [" << required_pe << ", " << rows << ", " << std::setprecision(10) << std::fixed << time_elapsed << "]," << std::endl;
+
             std::stringstream ss;
             ss = psm.read_memory_n(in);
             std::ofstream tmp_file("./val/compute_1/" + std::to_string(in) + "_" + std::to_string(required_pe) + "_" + std::to_string(rows) + ".txt");
             tmp_file << ss.rdbuf();
             tmp_file.close();
         }
+        out_file << "])" << std::endl
+                 << std::endl;
     }
     out_file.close();
 }
@@ -50,6 +53,7 @@ void calc_method_2()
     {
         unsigned in = input - 1;
         printf("** Input value: %d\n", in);
+        out_file << "compute_2_" << in << " = np.array([" << std::endl;
         for (int rows = 512; rows > 0; rows >>= 1)
         {
             unsigned required_pe = input / rows / 32;
@@ -59,8 +63,8 @@ void calc_method_2()
             }
             float time_elapsed = psm.time_compute_0(in, required_pe, rows);
             printf("Compute method 2 %#x using %*d pe and %*d rows took %.*fms.\n", in, 3, required_pe, 3, rows, 10, time_elapsed);
-            out_file << "Compute_method_2"
-                     << "\t" << in << "\t" << required_pe << "\t" << rows << "\t" << std::setprecision(10) << std::fixed << time_elapsed << std::endl;
+            out_file << "    [" << required_pe << ", " << rows << ", " << std::setprecision(10) << std::fixed << time_elapsed << "]," << std::endl;
+
             std::stringstream ss;
             ss = psm.read_memory_n(in);
             std::ofstream tmp_file("./val/compute_2/" + std::to_string(in) + "_" + std::to_string(required_pe) + "_" + std::to_string(rows) + ".txt");
@@ -68,6 +72,8 @@ void calc_method_2()
             tmp_file << ss.rdbuf();
             tmp_file.close();
         }
+        out_file << "])" << std::endl
+                 << std::endl;
     }
     out_file.close();
 }
@@ -83,6 +89,7 @@ void calc_method_3()
     {
         unsigned in = input - 1;
         printf("** Input value: %d\n", in);
+        out_file << "compute_3_" << in << " = np.array([" << std::endl;
         for (int rows = 512; rows > 0; rows >>= 1)
         {
             unsigned required_pe = input / rows / 32;
@@ -92,8 +99,8 @@ void calc_method_3()
             }
             float time_elapsed = psm.time_compute_0(in, required_pe, rows);
             printf("Compute method 3 %#x using %*d pe and %*d rows took %.*fms.\n", in, 3, required_pe, 3, rows, 10, time_elapsed);
-            out_file << "Compute_method_3"
-                     << "\t" << in << "\t" << required_pe << "\t" << rows << "\t" << std::setprecision(10) << std::fixed << time_elapsed << std::endl;
+            out_file << "    [" << required_pe << ", " << rows << ", " << std::setprecision(10) << std::fixed << time_elapsed << "]," << std::endl;
+
             std::stringstream ss;
             ss = psm.read_memory_n(in);
             std::ofstream tmp_file("./val/compute_3/" + std::to_string(in) + "_" + std::to_string(required_pe) + "_" + std::to_string(rows) + ".txt");
@@ -102,6 +109,8 @@ void calc_method_3()
             tmp_file << ss.rdbuf();
             tmp_file.close();
         }
+        out_file << "])" << std::endl
+                 << std::endl;
     }
     out_file.close();
 }
