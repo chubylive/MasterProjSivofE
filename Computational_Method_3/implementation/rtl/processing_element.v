@@ -61,24 +61,24 @@ assign                        max_offset_q = {1'b0, argument_3_q};
 ////////////////////////////////////////////////////////////////////////////////
 
 reg   [C_PE_OFFSET_W_Q    :0] current_offset_q;
-reg                     [3:0] current_offset_r;
+reg                     [1:0] current_offset_r;
 reg   [C_PE_STEP_W_R    -1:0] delta_index;
 
 wire  [C_PE_OFFSET_W_Q    :0] next_offset_stage_1_q;
-wire                    [3:0] next_offset_stage_1_r;
+wire                    [2:0] next_offset_stage_1_r;
 wire                          next_offset_stage_1_r_overflow;
-wire                    [3:0] next_offset_stage_2_r;
+wire                    [1:0] next_offset_stage_2_r;
 
-assign                        next_offset_stage_1_r          = current_offset_r + ((delta_index == argument_1_r) ? 3'h4 : 2'h2);
-assign                        next_offset_stage_1_r_overflow = ((next_offset_stage_1_r == 4'd7) | (next_offset_stage_1_r == 4'd11));
-assign                        next_offset_stage_2_r          = next_offset_stage_1_r_overflow ? ({1'b0, ~ next_offset_stage_1_r[2], 2'b01}) : next_offset_stage_1_r;
+assign                        next_offset_stage_1_r          = current_offset_r + ((delta_index == argument_1_r) ? 2'h2 : 1'b1);
+assign                        next_offset_stage_1_r_overflow = next_offset_stage_1_r[0];
+assign                        next_offset_stage_2_r          = {next_offset_stage_1_r_overflow ? next_offset_stage_1_r[2] : next_offset_stage_1_r[1], 1'b0};
 
 assign                        next_offset_stage_1_q          = current_offset_q + ((delta_index == 1'b0) ? {argument_1_q, {2 {argument_1_r}}} : {argument_1_q, argument_1_r}) + next_offset_stage_1_r_overflow;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 wire                          current_offset_at_most_max_offset;
-assign                        current_offset_at_most_max_offset = (current_offset_q < max_offset_q) | ((current_offset_q == max_offset_q) & ((~ current_offset_r[2]) | argument_3_r));
+assign                        current_offset_at_most_max_offset = (current_offset_q < max_offset_q) | ((current_offset_q == max_offset_q) & ((~ current_offset_r[1]) | argument_3_r));
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -124,13 +124,13 @@ assign                        current_offset_at_most_max_offset_and_next_memory_
 always @ (posedge clock) begin
         if (reset_n == 1'b0) begin
                 current_offset_q <= {(C_PE_OFFSET_W_Q+1) {1'b0}};
-                current_offset_r <= 4'h0;
+                current_offset_r <= 2'h0;
                 delta_index      <= {(C_PE_STEP_W_R) {1'b0}};
         end else begin
                 if (executing_compute_command) begin
                         if (~ start_registered) begin
                                 current_offset_q <= {1'b0, argument_2_q};
-                                current_offset_r <= {1'b0, argument_2_r, 2'b01};
+                                current_offset_r <= {      argument_2_r, 1'b0};
                                 delta_index      <= step_delta_index;
                         end else begin
                                 if (current_offset_at_most_max_offset_and_next_memory_read_address_equals_current_memory_read_address) begin
@@ -164,7 +164,7 @@ end
 ////////////////////////////////////////////////////////////////////////////////
 
 wire                    [4:0] current_boolean_bit_position;
-assign                        current_boolean_bit_position = {current_offset_q[3:0], current_offset_r[2]};
+assign                        current_boolean_bit_position = {current_offset_q[3:0], current_offset_r[1]};
 
 reg   [C_PE_M_DATA_W    -1:0] new_boolean_bit_vector;
 
