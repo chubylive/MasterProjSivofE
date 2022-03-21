@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #define NUMBER_OF_ROWS 512
-#define NUMBER_OF_PE   256
+#define NUMBER_OF_PE   272
 #define FIRST_PRIME    7
 
 #define MAX_OFFSET     (((NUMBER_OF_ROWS << 2) - 1) * 30 + 29)
