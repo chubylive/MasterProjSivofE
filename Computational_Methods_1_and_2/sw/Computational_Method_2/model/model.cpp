@@ -1,4 +1,5 @@
 
+#include <time.h>
 #include <stdio.h>
 
 #define NUMBER_OF_ROWS 512
@@ -174,9 +175,16 @@ void compute_all (void) {
 }
 
 int main () {
+        clock_t start, end;
         clear_memory_all ();
+        start = clock();
         compute_all      ();
-        read_memory_all  ();
+        end = clock();
+
+        // read_memory_all  ();
+        float cpu_time = ((float)(end - start)) * 1000 / CLOCKS_PER_SEC;
+        printf("Software Model Compute method 2 %#x using %*d pe and %*d rows took %.*fms.\n", MAX_N, 3, NUMBER_OF_PE, 3, NUMBER_OF_ROWS, 10, cpu_time);
+
 
         return 0;
 }

@@ -1,0 +1,4 @@
+Software Model Compute method 1 0x45ffff using 280 pe and 512 rows took 975.5910034180ms.
+Software Model Compute method 2 0x45ffff using 280 pe and 512 rows took 811.0750122070ms.
+Software Model Compute method 3 0xd1ffff using 280 pe and 512 rows took 929.8940429688ms.
+Software Model Compute method 4 0xfeffff using 272 pe and 512 rows took 1160.9300537109ms.

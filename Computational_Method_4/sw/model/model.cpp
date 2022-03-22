@@ -1,4 +1,5 @@
 
+#include <time.h>
 #include <stdio.h>
 
 #define NUMBER_OF_ROWS 512
@@ -18,44 +19,44 @@ unsigned index_to_value (unsigned index) {
         unsigned r;
 
         switch (index & 7) {
-                case 0 : {
-                        r = 1;
-                        break;
-                }
+        case 0 : {
+                r = 1;
+                break;
+        }
 
-                case 1 : {
-                        r = 7;
-                        break;
-                }
+        case 1 : {
+                r = 7;
+                break;
+        }
 
-                case 2 : {
-                        r = 11;
-                        break;
-                }
+        case 2 : {
+                r = 11;
+                break;
+        }
 
-                case 3 : {
-                        r = 13;
-                        break;
-                }
+        case 3 : {
+                r = 13;
+                break;
+        }
 
-                case 4 : {
-                        r = 17;
-                        break;
-                }
+        case 4 : {
+                r = 17;
+                break;
+        }
 
-                case 5 : {
-                        r = 19;
-                        break;
-                }
+        case 5 : {
+                r = 19;
+                break;
+        }
 
-                case 6 : {
-                        r = 23;
-                        break;
-                }
+        case 6 : {
+                r = 23;
+                break;
+        }
 
-                case 7 : {
-                        r = 29;
-                }
+        case 7 : {
+                r = 29;
+        }
         }
 
         return (30 * q + r);
@@ -66,44 +67,44 @@ unsigned value_to_index (unsigned value) {
         unsigned r;
 
         switch (value % 30) {
-                case 1 : {
-                        r = 0;
-                        break;
-                }
+        case 1 : {
+                r = 0;
+                break;
+        }
 
-                case 7 : {
-                        r = 1;
-                        break;
-                }
+        case 7 : {
+                r = 1;
+                break;
+        }
 
-                case 11 : {
-                        r = 2;
-                        break;
-                }
+        case 11 : {
+                r = 2;
+                break;
+        }
 
-                case 13 : {
-                        r = 3;
-                        break;
-                }
+        case 13 : {
+                r = 3;
+                break;
+        }
 
-                case 17 : {
-                        r = 4;
-                        break;
-                }
+        case 17 : {
+                r = 4;
+                break;
+        }
 
-                case 19 : {
-                        r = 5;
-                        break;
-                }
+        case 19 : {
+                r = 5;
+                break;
+        }
 
-                case 23 : {
-                        r = 6;
-                        break;
-                }
+        case 23 : {
+                r = 6;
+                break;
+        }
 
-                case 29 : {
-                        r = 7;
-                }
+        case 29 : {
+                r = 7;
+        }
         }
 
         return ((q << 3) | r);
@@ -181,44 +182,44 @@ void compute (unsigned pe_id, unsigned step_q, unsigned step_r, unsigned step_de
                 unsigned r;
 
                 switch (current_offset_r) {
-                        case 1 : {
-                                r = 0;
-                                break;
-                        }
+                case 1 : {
+                        r = 0;
+                        break;
+                }
 
-                        case 7 : {
-                                r = 1;
-                                break;
-                        }
+                case 7 : {
+                        r = 1;
+                        break;
+                }
 
-                        case 11 : {
-                                r = 2;
-                                break;
-                        }
+                case 11 : {
+                        r = 2;
+                        break;
+                }
 
-                        case 13 : {
-                                r = 3;
-                                break;
-                        }
+                case 13 : {
+                        r = 3;
+                        break;
+                }
 
-                        case 17 : {
-                                r = 4;
-                                break;
-                        }
+                case 17 : {
+                        r = 4;
+                        break;
+                }
 
-                        case 19 : {
-                                r = 5;
-                                break;
-                        }
+                case 19 : {
+                        r = 5;
+                        break;
+                }
 
-                        case 23 : {
-                                r = 6;
-                                break;
-                        }
+                case 23 : {
+                        r = 6;
+                        break;
+                }
 
-                        case 29 : {
-                                r = 7;
-                        }
+                case 29 : {
+                        r = 7;
+                }
                 }
 
                 row = (current_offset_q >> 2);
@@ -230,187 +231,187 @@ void compute (unsigned pe_id, unsigned step_q, unsigned step_r, unsigned step_de
                 write_memory_row (pe_id, row, memory_write_data);
 
                 switch (step_delta_index) {
-                        case 2 :
-                        case 4 :
+                case 2 :
+                case 4 :
+                case 7 : {
+                        current_offset_q += (step_q << 1);
+
+                        switch (step_r) {
+                        case 1 : {
+                                current_offset_r += 2;
+
+                                break;
+                        }
+
                         case 7 : {
-                                current_offset_q += (step_q << 1);
-
-                                switch (step_r) {
-                                        case 1 : {
-                                                current_offset_r += 2;
-
-                                                break;
-                                        }
-
-                                        case 7 : {
-                                                current_offset_r += 14;
-
-                                                break;
-                                        }
-
-                                        case 11 : {
-                                                current_offset_r += 22;
-
-                                                break;
-                                        }
-
-                                        case 13 : {
-                                                current_offset_r += 26;
-
-                                                break;
-                                        }
-
-                                        case 17 : {
-                                                current_offset_q += 1;
-                                                current_offset_r += 4;
-
-                                                break;
-                                        }
-
-                                        case 19 : {
-                                                current_offset_q += 1;
-                                                current_offset_r += 8;
-
-                                                break;
-                                        }
-
-                                        case 23 : {
-                                                current_offset_q += 1;
-                                                current_offset_r += 16;
-
-                                                break;
-                                        }
-
-                                        case 29 : {
-                                                current_offset_q += 1;
-                                                current_offset_r += 28;
-                                        }
-                                }
+                                current_offset_r += 14;
 
                                 break;
                         }
 
-                        case 1 :
-                        case 3 :
-                        case 5 : {
-                                current_offset_q += (step_q << 2);
-
-                                switch (step_r) {
-                                        case 1 : {
-                                                current_offset_r += 4;
-
-                                                break;
-                                        }
-
-                                        case 7 : {
-                                                current_offset_r += 28;
-
-                                                break;
-                                        }
-
-                                        case 11 : {
-                                                current_offset_q += 1;
-                                                current_offset_r += 14;
-
-                                                break;
-                                        }
-
-                                        case 13 : {
-                                                current_offset_q += 1;
-                                                current_offset_r += 22;
-
-                                                break;
-                                        }
-
-                                        case 17 : {
-                                                current_offset_q += 2;
-                                                current_offset_r += 8;
-
-                                                break;
-                                        }
-
-                                        case 19 : {
-                                                current_offset_q += 2;
-                                                current_offset_r += 16;
-
-                                                break;
-                                        }
-
-                                        case 23 : {
-                                                current_offset_q += 3;
-                                                current_offset_r += 2;
-
-                                                break;
-                                        }
-
-                                        case 29 : {
-                                                current_offset_q += 3;
-                                                current_offset_r += 26;
-                                        }
-                                }
+                        case 11 : {
+                                current_offset_r += 22;
 
                                 break;
                         }
 
-                        case 0 :
-                        case 6 : {
-                                current_offset_q += (step_q << 2) + (step_q << 1);
+                        case 13 : {
+                                current_offset_r += 26;
 
-                                switch (step_r) {
-                                        case 1 : {
-                                                current_offset_r += 6;
-
-                                                break;
-                                        }
-
-                                        case 7 : {
-                                                current_offset_q += 1;
-                                                current_offset_r += 12;
-
-                                                break;
-                                        }
-
-                                        case 11 : {
-                                                current_offset_q += 2;
-                                                current_offset_r += 6;
-
-                                                break;
-                                        }
-
-                                        case 13 : {
-                                                current_offset_q += 2;
-                                                current_offset_r += 18;
-
-                                                break;
-                                        }
-
-                                        case 17 : {
-                                                current_offset_q += 3;
-                                                current_offset_r += 12;
-
-                                                break;
-                                        }
-
-                                        case 19 : {
-                                                current_offset_q += 3;
-                                                current_offset_r += 24;
-
-                                                break;
-                                        }
-
-                                        case 23 : {
-                                                current_offset_q += 4;
-                                                current_offset_r += 18;
-
-                                                break;
-                                        }
-
-                                        case 29 : {
-                                                current_offset_q += 5;
-                                                current_offset_r += 24;
-                                        }
-                                }
+                                break;
                         }
+
+                        case 17 : {
+                                current_offset_q += 1;
+                                current_offset_r += 4;
+
+                                break;
+                        }
+
+                        case 19 : {
+                                current_offset_q += 1;
+                                current_offset_r += 8;
+
+                                break;
+                        }
+
+                        case 23 : {
+                                current_offset_q += 1;
+                                current_offset_r += 16;
+
+                                break;
+                        }
+
+                        case 29 : {
+                                current_offset_q += 1;
+                                current_offset_r += 28;
+                        }
+                        }
+
+                        break;
+                }
+
+                case 1 :
+                case 3 :
+                case 5 : {
+                        current_offset_q += (step_q << 2);
+
+                        switch (step_r) {
+                        case 1 : {
+                                current_offset_r += 4;
+
+                                break;
+                        }
+
+                        case 7 : {
+                                current_offset_r += 28;
+
+                                break;
+                        }
+
+                        case 11 : {
+                                current_offset_q += 1;
+                                current_offset_r += 14;
+
+                                break;
+                        }
+
+                        case 13 : {
+                                current_offset_q += 1;
+                                current_offset_r += 22;
+
+                                break;
+                        }
+
+                        case 17 : {
+                                current_offset_q += 2;
+                                current_offset_r += 8;
+
+                                break;
+                        }
+
+                        case 19 : {
+                                current_offset_q += 2;
+                                current_offset_r += 16;
+
+                                break;
+                        }
+
+                        case 23 : {
+                                current_offset_q += 3;
+                                current_offset_r += 2;
+
+                                break;
+                        }
+
+                        case 29 : {
+                                current_offset_q += 3;
+                                current_offset_r += 26;
+                        }
+                        }
+
+                        break;
+                }
+
+                case 0 :
+                case 6 : {
+                        current_offset_q += (step_q << 2) + (step_q << 1);
+
+                        switch (step_r) {
+                        case 1 : {
+                                current_offset_r += 6;
+
+                                break;
+                        }
+
+                        case 7 : {
+                                current_offset_q += 1;
+                                current_offset_r += 12;
+
+                                break;
+                        }
+
+                        case 11 : {
+                                current_offset_q += 2;
+                                current_offset_r += 6;
+
+                                break;
+                        }
+
+                        case 13 : {
+                                current_offset_q += 2;
+                                current_offset_r += 18;
+
+                                break;
+                        }
+
+                        case 17 : {
+                                current_offset_q += 3;
+                                current_offset_r += 12;
+
+                                break;
+                        }
+
+                        case 19 : {
+                                current_offset_q += 3;
+                                current_offset_r += 24;
+
+                                break;
+                        }
+
+                        case 23 : {
+                                current_offset_q += 4;
+                                current_offset_r += 18;
+
+                                break;
+                        }
+
+                        case 29 : {
+                                current_offset_q += 5;
+                                current_offset_r += 24;
+                        }
+                        }
+                }
                 }
 
                 if (current_offset_r > 29) {
@@ -436,44 +437,44 @@ unsigned compute_for_current_prime (unsigned current_prime) {
                 current_boolean_id = current_prime_squared;
 
                 switch (current_prime % 30) {
-                        case 1 : {
-                                current_prime_delta_index = 0;
-                                break;
-                        }
+                case 1 : {
+                        current_prime_delta_index = 0;
+                        break;
+                }
 
-                        case 7 : {
-                                current_prime_delta_index = 1;
-                                break;
-                        }
+                case 7 : {
+                        current_prime_delta_index = 1;
+                        break;
+                }
 
-                        case 11 : {
-                                current_prime_delta_index = 2;
-                                break;
-                        }
+                case 11 : {
+                        current_prime_delta_index = 2;
+                        break;
+                }
 
-                        case 13 : {
-                                current_prime_delta_index = 3;
-                                break;
-                        }
+                case 13 : {
+                        current_prime_delta_index = 3;
+                        break;
+                }
 
-                        case 17 : {
-                                current_prime_delta_index = 4;
-                                break;
-                        }
+                case 17 : {
+                        current_prime_delta_index = 4;
+                        break;
+                }
 
-                        case 19 : {
-                                current_prime_delta_index = 5;
-                                break;
-                        }
+                case 19 : {
+                        current_prime_delta_index = 5;
+                        break;
+                }
 
-                        case 23 : {
-                                current_prime_delta_index = 6;
-                                break;
-                        }
+                case 23 : {
+                        current_prime_delta_index = 6;
+                        break;
+                }
 
-                        case 29 : {
-                                current_prime_delta_index = 7;
-                        }
+                case 29 : {
+                        current_prime_delta_index = 7;
+                }
                 }
 
                 do {
@@ -565,9 +566,16 @@ void compute_all (void) {
 }
 
 int main () {
+        clock_t start, end;
         clear_memory_all ();
+        start = clock();
         compute_all      ();
-        read_memory_all  ();
+        end = clock();
+
+        // read_memory_all  ();
+        float cpu_time = ((float)(end - start)) * 1000 / CLOCKS_PER_SEC;
+        printf("Software Model Compute method 4 %#x using %*d pe and %*d rows took %.*fms.\n", MAX_N, 3, NUMBER_OF_PE, 3, NUMBER_OF_ROWS, 10, cpu_time);
+
 
         return 0;
 }
