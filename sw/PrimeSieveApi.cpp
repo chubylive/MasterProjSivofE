@@ -328,13 +328,15 @@ std::stringstream PrimeSieveApi::compute_prime(uint32_t n)
     unsigned current_prime_squared = current_prime * current_prime;
 
     clear_memory_all();
-
+    // get time
     while (compute_for_current_prime(current_prime) && current_prime_squared <= n)
     {
         current_prime = get_next_prime(current_prime);
         current_prime_squared = current_prime * current_prime;
     }
+    // get time
 
+    // compute time
     return read_memory_n(n);
 }
 
